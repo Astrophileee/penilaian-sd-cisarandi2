@@ -101,6 +101,7 @@ $(document).ready(function () {
         language: {
             searchPlaceholder: "Cari...",
             search: "",
+            emptyTable: "Belum ada penilaian yang menunggu persetujuan.",
         },
     });
 });

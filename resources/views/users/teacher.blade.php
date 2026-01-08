@@ -3,6 +3,11 @@
 @section('content')
     <div class="flex justify-between items-center mb-4">
         <h1 class="text-xl font-bold">Daftar Guru</h1>
+        <a href="{{ route('assignments.index') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100">
+            <button class="bg-black text-white px-4 py-2 rounded-md shadow hover:bg-gray-800">
+                Penugasan Guru Mata Pelajaran
+            </button>
+        </a>
         <button onclick="document.getElementById('modal-tambah-teacher').classList.remove('hidden')" class="bg-black text-white px-4 py-2 rounded-md shadow hover:bg-gray-800">
             Tambah
         </button>

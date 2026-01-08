@@ -12,9 +12,16 @@ class Assessment extends Model
         'semester_id',
         'tipe',
         'judul',
+        'persentase',
         'tanggal',
         'status',
         'approval_note',
+        'is_final',
+    ];
+
+    protected $casts = [
+        'persentase' => 'float',
+        'is_final' => 'boolean',
     ];
 
     public function teacherClassSubject()

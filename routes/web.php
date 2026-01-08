@@ -8,6 +8,7 @@ use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\StudentAssessmentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherAssessmentController;
 use App\Http\Controllers\TeacherClassSubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeacherController as ControllersTeacherController;
@@ -72,10 +73,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/teacher/assignments/{assignment}', [TeacherClassSubjectController::class, 'show'])->name('teachers.assignments.show');
     Route::post('/teacher/assignments/{assignment}/assessments', [TeacherClassSubjectController::class, 'storeAssessment'])
     ->name('teachers.assessments.store');
+    Route::post('/teacher/assignments/{assignment}/assessments/submit', [TeacherClassSubjectController::class, 'submitAssessments'])
+    ->name('teachers.assessments.submit');
+    Route::post('/teacher/assignments/{assignment}/assessments/final', [TeacherClassSubjectController::class, 'generateFinalGrades'])
+    ->name('teachers.assessments.generateFinal');
     Route::post('/teacher/assessments/{assessment}/grades', [TeacherClassSubjectController::class, 'storeGrades'])
     ->name('teachers.grades.store');
     Route::patch('/teacher/assessments/{assessment}', [TeacherClassSubjectController::class, 'updateAssessment'])
         ->name('teachers.assessments.update');
+
+    Route::get('/teacher/nilai', [TeacherAssessmentController::class, 'index'])
+        ->name('teachers.assessments.index');
+    Route::get('/teacher/nilai/{assignment}', [TeacherAssessmentController::class, 'show'])
+        ->name('teachers.assessments.show');
 
     Route::get('/headmaster/assessments', [HeadmasterAssessmentController::class, 'index'])->name('headmasters.assessments.index');
     Route::patch('/headmaster/assessments/{assessment}/status', [HeadmasterAssessmentController::class, 'updateStatus'])->name('headmasters.assessments.updateStatus');

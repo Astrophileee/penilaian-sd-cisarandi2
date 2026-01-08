@@ -19,11 +19,30 @@ class HeadmasterAssessmentController extends Controller
                 'teacherClassSubject.teacher.user',
                 'grades',
             ])
+            ->where('is_final', false)
             ->where('status', 'submitted')
-            ->orderBy('tanggal')
+            ->orderBy('teacher_class_subject_id')
+            ->orderBy('semester_id')
+            ->orderBy('id')
             ->get();
 
-        return view('headmasters.assessments.index', compact('assessments'));
+        $assessmentGroups = $assessments->groupBy(function ($assessment) {
+            return $assessment->teacher_class_subject_id . '-' . $assessment->semester_id;
+        });
+
+        $finalAssessments = collect();
+        if ($assessments->isNotEmpty()) {
+            $finalAssessments = Assessment::with('grades')
+                ->where('is_final', true)
+                ->whereIn('teacher_class_subject_id', $assessments->pluck('teacher_class_subject_id')->unique())
+                ->whereIn('semester_id', $assessments->pluck('semester_id')->unique())
+                ->get()
+                ->keyBy(function ($assessment) {
+                    return $assessment->teacher_class_subject_id . '-' . $assessment->semester_id;
+                });
+        }
+
+        return view('headmasters.assessments.index', compact('assessmentGroups', 'finalAssessments'));
     }
 
         public function updateStatus(Request $request, Assessment $assessment)
@@ -33,12 +52,16 @@ class HeadmasterAssessmentController extends Controller
             'approval_note' => 'nullable|string',
         ]);
 
-        $assessment->status = $validated['status'];
-        $assessment->approval_note = $validated['status'] === 'rejected'
+        $approvalNote = $validated['status'] === 'rejected'
             ? ($validated['approval_note'] ?? null)
             : null;
 
-        $assessment->save();
+        Assessment::where('teacher_class_subject_id', $assessment->teacher_class_subject_id)
+            ->where('semester_id', $assessment->semester_id)
+            ->update([
+                'status' => $validated['status'],
+                'approval_note' => $approvalNote,
+            ]);
 
         return redirect()
             ->route('headmasters.assessments.index')

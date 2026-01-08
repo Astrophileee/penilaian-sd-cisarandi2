@@ -81,11 +81,23 @@ class StudentAssessmentController extends Controller
         $assessments = Assessment::where('teacher_class_subject_id', $assignment->id)
             ->where('semester_id', $selectedSemester->id)
             ->where('status', 'approved')
+            ->where('is_final', false)
             ->with(['grades' => function ($q) use ($student) {
                 $q->where('student_id', $student->id);
             }])
-            ->orderBy('tanggal')
+            ->orderBy('id')
             ->get();
+
+        $finalAssessment = Assessment::where('teacher_class_subject_id', $assignment->id)
+            ->where('semester_id', $selectedSemester->id)
+            ->where('status', 'approved')
+            ->where('is_final', true)
+            ->with(['grades' => function ($q) use ($student) {
+                $q->where('student_id', $student->id);
+            }])
+            ->first();
+
+        $finalGrade = $finalAssessment?->grades->first()?->nilai;
 
         return view('students.assessments.detail', [ // atau 'show' sesuai file-mu
             'assignment'       => $assignment,
@@ -93,6 +105,7 @@ class StudentAssessmentController extends Controller
             'assessments'      => $assessments,
             'semesters'        => $semesters,
             'selectedSemester' => $selectedSemester,
+            'finalGrade'       => $finalGrade,
         ]);
     }
 

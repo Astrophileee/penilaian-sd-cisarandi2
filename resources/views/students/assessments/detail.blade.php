@@ -65,12 +65,18 @@
     </div>
 
 
+    <div class="mb-4">
+        <p class="text-sm text-gray-500">Nilai Akhir</p>
+        <p class="text-lg font-semibold text-gray-800">
+            {{ $finalGrade !== null ? $finalGrade : '-' }}
+        </p>
+    </div>
+
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm border border-gray-200">
             <thead class="bg-gray-100 text-gray-700">
                 <tr>
                     <th class="px-4 py-2 text-left">No</th>
-                    <th class="px-4 py-2 text-left">Tanggal</th>
                     <th class="px-4 py-2 text-left">Jenis</th>
                     <th class="px-4 py-2 text-left">Judul</th>
                     <th class="px-4 py-2 text-left">Nilai</th>
@@ -80,13 +86,12 @@
                 @forelse ($assessments as $assessment)
                     @php
                         $grade = $assessment->grades->first();
-                    @endphp
-                    <tr class="border-b">
-                        <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                        <td class="px-4 py-2">{{ $assessment->tanggal }}</td>
-                        <td class="px-4 py-2 capitalize">{{ $assessment->tipe }}</td>
-                        <td class="px-4 py-2">{{ $assessment->judul }}</td>
-                        <td class="px-4 py-2 font-semibold">
+                @endphp
+                <tr class="border-b">
+                    <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                    <td class="px-4 py-2 capitalize">{{ $assessment->tipe }}</td>
+                    <td class="px-4 py-2">{{ $assessment->judul }}</td>
+                    <td class="px-4 py-2 font-semibold">
                             @if($grade)
                                 {{ $grade->nilai }}
                             @else
@@ -94,12 +99,12 @@
                             @endif
                         </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-4 py-3 text-center text-gray-500">
-                            Belum ada nilai yang disetujui untuk mapel ini.
-                        </td>
-                    </tr>
+            @empty
+                <tr>
+                    <td colspan="4" class="px-4 py-3 text-center text-gray-500">
+                        Belum ada nilai yang disetujui untuk mapel ini.
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>

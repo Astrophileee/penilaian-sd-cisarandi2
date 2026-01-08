@@ -37,6 +37,28 @@
         </p>
     </div>
 
+    @php
+        $mapelStatus = $assessments->first()?->status ?? 'draft';
+        $mapelNote = $assessments->first()?->approval_note;
+    @endphp
+
+    <div class="mb-6">
+        <p class="text-sm text-gray-500 mb-1">Status Penilaian Mapel</p>
+        <div class="inline-flex items-center gap-2">
+            <span class="px-2 py-1 text-xs rounded-full
+                @if($mapelStatus === 'approved') bg-green-100 text-green-700
+                @elseif($mapelStatus === 'submitted') bg-yellow-100 text-yellow-700
+                @elseif($mapelStatus === 'rejected') bg-red-100 text-red-700
+                @else bg-gray-100 text-gray-700
+                @endif">
+                {{ ucfirst($mapelStatus) }}
+            </span>
+            @if($mapelStatus === 'rejected' && $mapelNote)
+                <span class="text-xs text-red-600">Catatan: {{ $mapelNote }}</span>
+            @endif
+        </div>
+    </div>
+
     <!-- Tabs -->
     <div>
         <div class="border-b border-gray-200 mb-4">
@@ -44,7 +66,7 @@
                 <button id="tab-assessment"
                         onclick="showTab('assessment')"
                         class="tab-button border-b-2 border-black text-black px-3 py-2 text-sm font-medium">
-                    Daftar Tugas / Penilaian
+                    Daftar Aspek Penilaian
                 </button>
                 <button id="tab-student"
                         onclick="showTab('student')"
@@ -54,62 +76,64 @@
             </nav>
         </div>
 
-        <!-- Tab 1: Daftar Tugas -->
+        <!-- Tab 1: Daftar Aspek -->
         <div id="content-assessment" class="tab-content">
-            <button
-                type="button"
-                onclick="openAssessmentModal()"
-                class="text-green-600 hover:text-green-900 border border-green-600 rounded-md px-4 py-2 mb-5 text-sm focus:outline-none focus:ring-2 focus:ring-green-200">
-                Buat Tugas Harian
-            </button>
+            <div class="flex flex-wrap items-center gap-2 mb-5">
+                @if(in_array($mapelStatus, ['draft', 'rejected']))
+                    <button
+                        type="button"
+                        onclick="openAssessmentModal()"
+                        class="text-green-600 hover:text-green-900 border border-green-600 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-200">
+                        Tambah Aspek Penilaian
+                    </button>
+                    @if($assessments->isNotEmpty())
+                        <form method="POST" action="{{ route('teachers.assessments.submit', $assignment->id) }}">
+                            @csrf
+                            <button type="submit" class="text-blue-600 hover:text-blue-900 border border-blue-600 rounded-md px-4 py-2 text-sm">
+                                Kirim Penilaian
+                            </button>
+                        </form>
+                    @endif
+                @endif
+                @if($assessments->isNotEmpty())
+                    <form method="POST" action="{{ route('teachers.assessments.generateFinal', $assignment->id) }}">
+                        @csrf
+                        <button type="submit" class="text-gray-700 hover:text-gray-900 border border-gray-500 rounded-md px-4 py-2 text-sm">
+                            Generate Nilai Akhir
+                        </button>
+                    </form>
+                @endif
+            </div>
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm border border-gray-200">
                     <thead class="bg-gray-100 text-gray-700">
                         <tr>
                             <th class="px-4 py-2 text-left">No</th>
-                            <th class="px-4 py-2 text-left">Tanggal</th>
                             <th class="px-4 py-2 text-left">Jenis</th>
-                            <th class="px-4 py-2 text-left">Nama</th>
-                            <th class="px-4 py-2 text-left">Status</th>
-                            <th class="px-4 py-2 text-left">Alasan Ditolak</th>
+                            <th class="px-4 py-2 text-left">Judul Aspek</th>
                             <th class="px-4 py-2 text-left">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($assessments as $assessment)
-                            @php
-                                $gradeMap = $assessment->grades->pluck('nilai', 'student_id');
-                            @endphp
                             <tr class="border-b">
                                 <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                                <td class="px-4 py-2">{{ $assessment->tanggal }}</td>
                                 <td class="px-4 py-2 capitalize">{{ $assessment->tipe }}</td>
                                 <td class="px-4 py-2">{{ $assessment->judul }}</td>
                                 <td class="px-4 py-2">
-                                    <span class="px-2 py-1 text-xs rounded-full
-                                        @if($assessment->status === 'approved') bg-green-100 text-green-700
-                                        @elseif($assessment->status === 'submitted') bg-yellow-100 text-yellow-700
-                                        @elseif($assessment->status === 'rejected') bg-red-100 text-red-700
-                                        @else bg-gray-100 text-gray-700
-                                        @endif">
-                                        {{ ucfirst($assessment->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-2">{{ $assessment->approval_note ?? '-' }}</td>
-                                <td class="px-4 py-2">
-                                    <button
-                                        type="button"
-                                        onclick='openEditAssessmentModal(
-                                            {{ $assessment->id }},
-                                            @json($assessment->judul),
-                                            @json($assessment->tanggal),
-                                            @json($assessment->status)
-                                        )'
-                                        class="text-gray-700 hover:text-gray-900 border border-gray-500 rounded-md px-3 py-1 text-xs">
-                                        Edit
-                                    </button>
-                                        @if(in_array($assessment->status, ['draft', 'rejected']))
+                                    @if(in_array($mapelStatus, ['draft', 'rejected']))
+                                        <button
+                                            type="button"
+                                            onclick='openEditAssessmentModal(
+                                                {{ $assessment->id }},
+                                                @json($assessment->judul),
+                                                @json($assessment->tipe),
+                                                @json($assessment->persentase)
+                                            )'
+                                            class="text-gray-700 hover:text-gray-900 border border-gray-500 rounded-md px-3 py-1 text-xs">
+                                            Edit
+                                        </button>
                                         <button
                                             type="button"
                                             onclick='openGradeModal(
@@ -122,14 +146,14 @@
                                         </button>
                                     @else
                                         <span class="text-xs text-gray-400 italic">
-                                            Nilai terkunci
+                                            Penilaian terkunci
                                         </span>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-4 py-3 text-center text-gray-500">
+                                <td colspan="4" class="px-4 py-3 text-center text-gray-500">
                                     Belum ada data penilaian
                                 </td>
                             </tr>
@@ -148,6 +172,7 @@
                             <th class="px-4 py-2 text-left">No</th>
                             <th class="px-4 py-2 text-left">Nama</th>
                             <th class="px-4 py-2 text-left">Kelas</th>
+                            <th class="px-4 py-2 text-left">Nilai Akhir</th>
                             <th class="px-4 py-2 text-left">No HP Wali</th>
                         </tr>
                     </thead>
@@ -157,11 +182,17 @@
                                 <td class="px-4 py-2">{{ $loop->iteration }}</td>
                                 <td class="px-4 py-2">{{ $student->user->name ?? '-' }}</td>
                                 <td class="px-4 py-2">{{ $assignment->classroom->nama }}</td>
+                                <td class="px-4 py-2 font-semibold">
+                                    @php
+                                        $finalValue = $finalGrades->get($student->id);
+                                    @endphp
+                                    {{ $finalValue !== null ? $finalValue : '-' }}
+                                </td>
                                 <td class="px-4 py-2">{{ $student->no_hp_wali ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-4 py-3 text-center text-gray-500">Belum ada murid</td>
+                                <td colspan="5" class="px-4 py-3 text-center text-gray-500">Belum ada murid</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -171,28 +202,33 @@
     </div>
 </div>
 
-{{-- Modal Buat Tugas Harian --}}
+{{-- Modal Tambah Aspek Penilaian --}}
 <div id="modal-create-assessment" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 hidden">
     <div class="min-h-screen flex items-center justify-center py-6 px-4">
         <div class="bg-white w-full max-w-md mx-auto rounded-lg shadow-lg p-6 relative">
             <button onclick="closeAssessmentModal()" class="absolute top-4 right-4 text-xl font-bold text-gray-600 hover:text-gray-800">&times;</button>
 
-            <h2 class="text-lg font-semibold mb-4">Buat Tugas Harian</h2>
+            <h2 class="text-lg font-semibold mb-4">Tambah Aspek Penilaian</h2>
 
             <form id="createAssessmentForm"
                   action="{{ route('teachers.assessments.store', $assignment->id) }}"
                   method="POST">
                 @csrf
-                <input type="hidden" name="type" value="tugas">
 
                 <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700">Judul Tugas *</label>
+                    <label class="block text-sm font-medium text-gray-700">Judul Aspek Penilaian *</label>
                     <input type="text" name="judul" class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal *</label>
-                    <input type="date" name="tanggal" class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
+                    <label class="block text-sm font-medium text-gray-700">Jenis Aspek *</label>
+                    <input type="text" name="tipe" class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Persentase (%) *</label>
+                    <input type="number" name="persentase" step="0.01" min="0" max="10"
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
@@ -257,35 +293,34 @@
         <div class="bg-white w-full max-w-md mx-auto rounded-lg shadow-lg p-6 relative">
             <button onclick="closeEditAssessmentModal()" class="absolute top-4 right-4 text-xl font-bold text-gray-600 hover:text-gray-800">&times;</button>
 
-            <h2 class="text-lg font-semibold mb-4" id="editAssessmentTitle">Edit Penilaian</h2>
+            <h2 class="text-lg font-semibold mb-4" id="editAssessmentTitle">Edit Aspek Penilaian</h2>
 
             <form id="editAssessmentForm" method="POST" action="">
                 @csrf
                 @method('PATCH')
 
                 <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700">Judul</label>
-                    <input type="text" name="judul" id="editAssessmentJudul"
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm">
-                </div>
-
-                <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal *</label>
-                    <input type="date" name="tanggal" id="editAssessmentTanggal"
+                    <label class="block text-sm font-medium text-gray-700">Jenis Aspek *</label>
+                    <input type="text" name="tipe" id="editAssessmentTipe"
                            class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Status *</label>
-                    <select name="status" id="editAssessmentStatus" class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
-                        <option value="" selected>Pilih Status</option>
-                        <option value="draft">Draft</option>
-                        <option value="submitted">Submit</option>
-                    </select>
-                    @error('status')
-                        <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
-                    @enderror
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Judul Aspek *</label>
+                    <input type="text" name="judul" id="editAssessmentJudul"
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
                 </div>
+
+                <div class="mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Persentase (%) *</label>
+                    <input type="number" name="persentase" id="editAssessmentPersentase"
+                           step="0.01" min="0" max="100"
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
+                </div>
+
+                <p id="editAssessmentInfo" class="text-xs text-gray-500 mt-2 hidden">
+                    Persentase aspek default mengikuti ketentuan dan tidak dapat diubah.
+                </p>
 
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeEditAssessmentModal()" class="px-4 py-2 rounded-md border text-sm">Batal</button>
@@ -327,21 +362,50 @@
         document.getElementById('createAssessmentForm').reset();
     }
 
-    function openEditAssessmentModal(assessmentId, judul, tanggal, status) {
+    const defaultAssessmentTypes = ['uts', 'uas', 'absen', 'tugas', 'sikap'];
+
+    function normalizeAssessmentType(value) {
+        return (value || '').toString().toLowerCase().trim();
+    }
+
+    function openEditAssessmentModal(assessmentId, judul, tipe, persentase) {
         const modal = document.getElementById('modal-edit-assessment');
         modal.classList.remove('hidden');
 
-        document.getElementById('editAssessmentTitle').innerText = 'Edit Penilaian - ' + judul;
+        document.getElementById('editAssessmentTitle').innerText = 'Edit Aspek Penilaian - ' + judul;
 
         const form = document.getElementById('editAssessmentForm');
         const actionTemplate = @json(route('teachers.assessments.update', ['assessment' => '__ID__']));
         form.action = actionTemplate.replace('__ID__', assessmentId);
 
-        document.getElementById('editAssessmentJudul').value = judul || '';
-        document.getElementById('editAssessmentTanggal').value = tanggal || '';
+        const tipeInput = document.getElementById('editAssessmentTipe');
+        const judulInput = document.getElementById('editAssessmentJudul');
+        const persentaseInput = document.getElementById('editAssessmentPersentase');
+        const info = document.getElementById('editAssessmentInfo');
 
-        status = (status || '').toLowerCase().trim();
-        document.getElementById('editAssessmentStatus').value = status;
+        tipeInput.value = tipe || '';
+        judulInput.value = judul || '';
+        persentaseInput.value = persentase ?? '';
+
+        const isDefault = defaultAssessmentTypes.includes(normalizeAssessmentType(tipe));
+        tipeInput.readOnly = isDefault;
+        persentaseInput.readOnly = isDefault;
+        persentaseInput.max = isDefault ? '100' : '10';
+
+        const readOnlyClasses = ['bg-gray-100', 'text-gray-500'];
+        if (isDefault) {
+            info.classList.remove('hidden');
+            readOnlyClasses.forEach((cls) => {
+                tipeInput.classList.add(cls);
+                persentaseInput.classList.add(cls);
+            });
+        } else {
+            info.classList.add('hidden');
+            readOnlyClasses.forEach((cls) => {
+                tipeInput.classList.remove(cls);
+                persentaseInput.classList.remove(cls);
+            });
+        }
     }
 
     function closeEditAssessmentModal() {

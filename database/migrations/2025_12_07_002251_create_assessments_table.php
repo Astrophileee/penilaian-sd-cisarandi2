@@ -17,9 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('semester_id');
             $table->string('tipe');
             $table->string('judul');
-            $table->date('tanggal');
+            $table->decimal('persentase', 5, 2)->default(0);
+            $table->date('tanggal')->nullable();
             $table->string('status');
             $table->text('approval_note')->nullable();
+            $table->boolean('is_final')->default(false);
             $table->timestamps();
 
             $table->foreign('teacher_class_subject_id')->references('id')->on('teacher_class_subjects')->cascadeOnUpdate();

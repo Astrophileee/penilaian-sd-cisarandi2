@@ -86,7 +86,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Kelas *</label>
                     <select name="classroom_id" class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm" required>
-                        <option value="" selected>Pilih Guru</option>
+                        <option value="" selected>Pilih Kelas</option>
                         @foreach ($classrooms as $classroom)
                             <option value="{{ $classroom->id }}">{{ $classroom->nama}}</option>
                         @endforeach
