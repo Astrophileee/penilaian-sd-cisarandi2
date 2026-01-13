@@ -3,10 +3,12 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HeadmasterAssessmentController;
+use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\StudentAssessmentController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentInformationController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherAssessmentController;
 use App\Http\Controllers\TeacherClassSubjectController;
@@ -62,6 +64,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{subject}', [SubjectController::class, 'destroy'])->name('destroy');
     });
 
+    Route::prefix('information')->name('information.')->group(function () {
+        Route::get('/', [InformationController::class, 'index'])->name('index');
+        Route::post('/', [InformationController::class, 'store'])->name('store');
+        Route::patch('/{information}', [InformationController::class, 'update'])->name('update');
+        Route::delete('/{information}', [InformationController::class, 'destroy'])->name('destroy');
+    });
+
     Route::prefix('assignments')->name('assignments.')->group(function () {
         Route::get('/', [TeacherClassSubjectController::class, 'index'])->name('index');
         Route::post('/', [TeacherClassSubjectController::class, 'store'])->name('store');
@@ -90,8 +99,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/headmaster/assessments', [HeadmasterAssessmentController::class, 'index'])->name('headmasters.assessments.index');
     Route::patch('/headmaster/assessments/{assessment}/status', [HeadmasterAssessmentController::class, 'updateStatus'])->name('headmasters.assessments.updateStatus');
 
-        Route::get('/siswa/nilai', [StudentAssessmentController::class, 'index'])
+    Route::get('/siswa/nilai', [StudentAssessmentController::class, 'index'])
         ->name('students.assessments.index');
+
+    Route::get('/siswa/informasi', [StudentInformationController::class, 'index'])
+        ->name('students.information.index');
 
     Route::get('/siswa/nilai/{assignment}', [StudentAssessmentController::class, 'show'])
         ->name('students.assessments.show');

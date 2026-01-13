@@ -39,6 +39,7 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name'          => 'required|string|max:100',
             'email'         => 'required|email|unique:users,email',
+            'nik'           => 'required|string|max:32|unique:students,nik',
             'kelas_id'      => 'required|exists:classrooms,id',
             'tanggal_lahir' => 'required|date',
             'alamat'        => 'required|string',
@@ -59,6 +60,7 @@ class StudentController extends Controller
 
             Student::create([
                 'user_id'       => $user->id,
+                'nik'           => $validated['nik'],
                 'kelas_id'      => $validated['kelas_id'],
                 'tanggal_lahir' => $validated['tanggal_lahir'],
                 'alamat'        => $validated['alamat'],
@@ -105,6 +107,12 @@ class StudentController extends Controller
                 'email',
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
+            'nik'           => [
+                'required',
+                'string',
+                'max:32',
+                Rule::unique('students', 'nik')->ignore($student->id),
+            ],
             'kelas_id'      => ['required', 'exists:classrooms,id'],
             'tanggal_lahir' => ['required', 'date'],
             'alamat'        => ['required', 'string'],
@@ -124,6 +132,7 @@ class StudentController extends Controller
             $user->save();
 
             $student->update([
+                'nik'           => $validated['nik'],
                 'kelas_id'      => $validated['kelas_id'],
                 'tanggal_lahir' => $validated['tanggal_lahir'],
                 'alamat'        => $validated['alamat'],

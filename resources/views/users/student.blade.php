@@ -14,6 +14,7 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">No</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nama</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">NIK</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Kelas</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Alamat</th>
@@ -29,6 +30,7 @@
                     <tr>
                         <td class="whitespace-nowrap text-gray-700">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 text-gray-700">{{ $student->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $student->student->nik }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $student->email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $student->student->classroom->nama }}</td>
                         <td class="px-6 py-4 text-gray-700">{{ $student->student->alamat }}</td>
@@ -83,6 +85,15 @@
                         <label class="block text-sm font-medium text-gray-700">Nama *</label>
                         <input type="text" name="name" value="{{ old('name') }}" required class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm">
                         @error('name')
+                            <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- NIK -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">NIK *</label>
+                        <input type="text" name="nik" value="{{ old('nik') }}" required class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm">
+                        @error('nik')
                             <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
                         @enderror
                     </div>
@@ -196,6 +207,15 @@
                     @enderror
                 </div>
 
+                <!-- NIK -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">NIK *</label>
+                    <input type="text" name="nik" id="editNik" value="{{ old('nik') }}" required class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 text-sm">
+                    @error('nik')
+                        <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <!-- Email -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Email *</label>
@@ -300,6 +320,7 @@
         form.dataset.baseAction = baseAction;
         form.action = baseAction.replace('__ID__', student.student.id);
         document.getElementById('editName').value = student.name ?? '';
+        document.getElementById('editNik').value = student.student.nik ?? '';
         document.getElementById('editEmail').value = student.email ?? '';
         document.getElementById('editKelasId').value = student.student.kelas_id ?? '';
         document.getElementById('editTanggalLahir').value = student.student.tanggal_lahir ?? '';

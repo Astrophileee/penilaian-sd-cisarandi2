@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('nama_wali');
             $table->string('no_hp_wali');
             $table->string('status');
+            $table->string('nik', 32)->nullable()->unique();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate();

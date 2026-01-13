@@ -72,6 +72,7 @@ class DatabaseSeeder extends Seeder
                 'nama_wali' => 'Bambang',
                 'no_hp_wali' => '081234567891',
                 'status' => 'aktif',
+                'nik' => '3012345678910'
             ]
         );
 
