@@ -86,10 +86,12 @@
                 @forelse ($assessments as $assessment)
                     @php
                         $grade = $assessment->grades->first();
+                        $typeKey = strtolower(trim($assessment->tipe ?? ''));
+                        $typeLabel = $typeKey === 'uts' ? 'ATS' : ($typeKey === 'uas' ? 'ASAS' : $assessment->tipe);
                 @endphp
                 <tr class="border-b">
                     <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                    <td class="px-4 py-2 capitalize">{{ $assessment->tipe }}</td>
+                    <td class="px-4 py-2 capitalize">{{ $typeLabel }}</td>
                     <td class="px-4 py-2">{{ $assessment->judul }}</td>
                     <td class="px-4 py-2 font-semibold">
                             @if($grade)

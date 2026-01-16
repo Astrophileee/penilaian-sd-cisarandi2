@@ -71,7 +71,7 @@
         <i class="fas fa-home w-5 h-5 pt-1 text-gray-600"></i>
         Lihat Nilai
     </a>
-    <a href="{{ route('students.information.index') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100">
+    <a href="{{ route('public.information') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100">
         <i class="fas fa-home w-5 h-5 pt-1 text-gray-600"></i>
         Informasi
     </a>

@@ -14,11 +14,22 @@ use App\Http\Controllers\TeacherAssessmentController;
 use App\Http\Controllers\TeacherClassSubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeacherController as ControllersTeacherController;
+use App\Models\Information;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('public.profile');
+})->name('public.profile');
+
+// Route::get('/profil-sekolah', function () {
+//     return view('public.profile');
+// })->name('public.profile');
+
+Route::get('/informasi', function () {
+    $informations = Information::latest()->get();
+
+    return view('public.information', compact('informations'));
+})->name('public.information');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -102,8 +113,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/siswa/nilai', [StudentAssessmentController::class, 'index'])
         ->name('students.assessments.index');
 
-    Route::get('/siswa/informasi', [StudentInformationController::class, 'index'])
-        ->name('students.information.index');
+    Route::get('/siswa/informasi', function () {
+        return redirect()->route('public.information');
+    })->name('students.information.index');
 
     Route::get('/siswa/nilai/{assignment}', [StudentAssessmentController::class, 'show'])
         ->name('students.assessments.show');

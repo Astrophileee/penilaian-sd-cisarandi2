@@ -28,9 +28,9 @@
                             $label = $assessment->judul;
 
                             if ($type === 'uts') {
-                                $label = 'UTS';
+                                $label = 'ATS';
                             } elseif ($type === 'uas') {
-                                $label = 'UAS';
+                                $label = 'ASAS';
                             } elseif ($type === 'tugas') {
                                 $label = 'Tugas Harian';
                             } elseif ($type === 'absen') {
@@ -73,8 +73,12 @@
                         <td class="px-6 py-4 text-gray-700">
                             <div class="space-y-1">
                                 @foreach ($group as $aspect)
+                                    @php
+                                        $typeKey = strtolower(trim($aspect->tipe ?? ''));
+                                        $typeLabel = $typeKey === 'uts' ? 'ATS' : ($typeKey === 'uas' ? 'ASAS' : $aspect->tipe);
+                                    @endphp
                                     <div class="text-xs text-gray-700">
-                                        <span class="font-semibold capitalize">{{ $aspect->tipe }}</span>
+                                        <span class="font-semibold capitalize">{{ $typeLabel }}</span>
                                         - {{ $aspect->judul }}
                                     </div>
                                 @endforeach

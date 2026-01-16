@@ -17,7 +17,7 @@
                         </p>
                     </div>
                     @if ($information->file_path)
-                        <a href="{{ asset('storage/' . $information->file_path) }}" target="_blank" rel="noopener" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+                        <a href="{{ asset('storage/' . $information->file_path) }}" download target="_blank" rel="noopener" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
                             Unduh PDF
                         </a>
                     @endif

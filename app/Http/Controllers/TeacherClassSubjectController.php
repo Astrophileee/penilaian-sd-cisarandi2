@@ -114,8 +114,8 @@ class TeacherClassSubjectController extends Controller
     private function ensureDefaultAssessments(TeacherClassSubject $assignment, Semester $semester): void
     {
         $defaults = [
-            'uts' => ['judul' => 'Ulangan Tengah Semester', 'persentase' => 25],
-            'uas' => ['judul' => 'Ulangan Akhir Semester', 'persentase' => 30],
+            'uts' => ['judul' => 'Asesmen Tengah Semester', 'persentase' => 25],
+            'uas' => ['judul' => 'Asesmen Sumatif Akhir Semester', 'persentase' => 30],
             'absen' => ['judul' => 'Absen', 'persentase' => 10],
             'tugas' => ['judul' => 'Tugas Harian', 'persentase' => 15],
             'sikap' => ['judul' => 'Sikap', 'persentase' => 10],
@@ -140,6 +140,19 @@ class TeacherClassSubjectController extends Controller
 
             if ($assessment->persentase !== (float) $data['persentase']) {
                 $assessment->update(['persentase' => $data['persentase']]);
+            }
+
+            if ($assessment->judul !== $data['judul']) {
+                $legacyTitles = [
+                    'Ulangan Tengah Semester',
+                    'Ulangan Akhir Semester',
+                    'UTS',
+                    'UAS',
+                ];
+
+                if (in_array($assessment->judul, $legacyTitles, true)) {
+                    $assessment->update(['judul' => $data['judul']]);
+                }
             }
 
             if ($assessment->is_final) {

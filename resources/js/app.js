@@ -104,4 +104,14 @@ $(document).ready(function () {
             emptyTable: "Belum ada penilaian yang menunggu persetujuan.",
         },
     });
+    $("#informationTable").DataTable({
+        responsive: true,
+        pageLength: 10,
+        lengthChange: false,
+        language: {
+            searchPlaceholder: "Cari...",
+            search: "",
+            emptyTable: "Belum ada penilaian yang menunggu persetujuan.",
+        },
+    });
 });
